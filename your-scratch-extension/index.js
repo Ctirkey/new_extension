@@ -1,8 +1,10 @@
 const BlockType = require('../../extension-support/block-type');
 const ArgumentType = require('../../extension-support/argument-type');
 const TargetType = require('../../extension-support/target-type');
+const fetch = require('node-fetch');
 
 let blocks = [];
+let studentInfo = {};
 class Scratch3YourExtension {
 
     constructor (runtime) {
@@ -127,6 +129,13 @@ class Scratch3YourExtension {
                     terminal: false,
                     filter: [TargetType.SPRITE, TargetType.STAGE],
 
+                },
+                {
+                    opcode: 'endBlock',
+                    blockType: BlockType.COMMAND,
+                    text: 'The End',
+                    terminal: false,
+                    filter: [TargetType.SPRITE, TargetType.STAGE]
                 }
             ]
         };
@@ -150,6 +159,7 @@ class Scratch3YourExtension {
 
     displayStudentInfo ({NAME, Num, Grade}) {
         const currentTime = new Date().toLocaleString();
+        studentInfo = { NAME, Num, Grade, currentTime };
         console.log('Name:'+ NAME +', Roll_No:'+ Num +', Grade:'+ Grade + ', Time:' + currentTime);
     }
 
@@ -159,6 +169,31 @@ class Scratch3YourExtension {
     printBlocks(){
         console.log('Block List: ', blocks);
         blocks = [];
+    }
+
+    async endBlock (){
+        const data = {
+            blocks,
+            studentInfo
+        };
+        try {
+            const response = await fetch('http://127.0.0.1:8000/status/2/test_post/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const responseData = await response.json();
+            console.log('Data sent successfully:', responseData);
+        } catch (error) {
+            console.error('Failed to send data:', error);
+        }
     }
   
 }
