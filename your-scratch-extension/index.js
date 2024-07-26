@@ -2,6 +2,7 @@ const BlockType = require('../../extension-support/block-type');
 const ArgumentType = require('../../extension-support/argument-type');
 const TargetType = require('../../extension-support/target-type');
 
+let blocks = [];
 class Scratch3YourExtension {
 
     constructor (runtime) {
@@ -17,7 +18,7 @@ class Scratch3YourExtension {
             id: 'yourScratchExtension',
 
             // name that will be displayed in the Scratch UI
-            name: 'Demo',
+            name: 'ATR',
 
             // colours to use for your extension blocks
             color1: '#000099',
@@ -31,6 +32,7 @@ class Scratch3YourExtension {
             blocks: [
                 {
                     // name of the function where your block code lives
+                    id: 'block1',
                     opcode: 'myFirstBlock',
 
                     // type of block - choose from:
@@ -81,6 +83,50 @@ class Scratch3YourExtension {
                             type: ArgumentType.STRING
                         }
                     }
+                },
+                {
+                    id: 'block2',
+                    opcode: 'saySomething',
+                    blockType: BlockType.COMMAND,
+                    text: 'Say [TEXT]',
+                    terminal: false,
+                    filter: [TargetType.SPRITE, TargetType.STAGE],
+                    arguments: {
+                        TEXT: {
+                            defaultValue: 'Hello',
+                            type: ArgumentType.STRING
+                        }
+                    }
+
+                },
+                {
+                    opcode: 'displayStudentInfo',
+                    blockType: BlockType.COMMAND,
+                    text: 'Enter Name[NAME], Roll No.[Num], Class[Grade]',
+                    terminal: false,
+                    filter: [TargetType.SPRITE, TargetType.STAGE],
+                    arguments: {
+                        NAME: {
+                            defaultValue: 'ABC',
+                            type: ArgumentType.STRING
+                        },
+                        Num: {
+                            defaultValue: '123',
+                            type: ArgumentType.STRING
+                        },
+                        Grade: {
+                            defaultValue: '4',
+                            type: ArgumentType.STRING
+                        }
+                    }
+                },
+                {
+                    opcode: 'printBlocks',
+                    blockType: BlockType.COMMAND,
+                    text: 'Print Blocks',
+                    terminal: false,
+                    filter: [TargetType.SPRITE, TargetType.STAGE],
+
                 }
             ]
         };
@@ -92,9 +138,28 @@ class Scratch3YourExtension {
      *  this will be called when the block is used
      */
     myFirstBlock ({ MY_NUMBER, MY_STRING }) {
+        this.addBlockToList('block1');
         // example implementation to return a string
         return MY_STRING + ' : doubled would be ' + (MY_NUMBER * 2);
     }
+
+    saySomething ({TEXT}){
+        this.addBlockToList('block2');
+        console.log( 'User Entered: '+ TEXT);
+    }
+
+    displayStudentInfo ({NAME, Num, Grade}) {
+        const currentTime = new Date().toLocaleString();
+        console.log('Name:'+ NAME +', Roll_No:'+ Num +', Grade:'+ Grade + ', Time:' + currentTime);
+    }
+
+    addBlockToList(blockID){
+        blocks.push(blockID);
+    }
+    printBlocks(){
+        console.log('Block List: ', blocks);
+    }
+  
 }
 
 module.exports = Scratch3YourExtension;
