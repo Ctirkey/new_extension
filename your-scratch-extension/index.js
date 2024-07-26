@@ -158,6 +158,7 @@ class Scratch3YourExtension {
     }
     printBlocks(){
         console.log('Block List: ', blocks);
+        blocks = [];
     }
   
 }
